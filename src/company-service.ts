@@ -1,4 +1,4 @@
-export const getCompanies = async () => {
+export const getCompanies = async (): Promise<Company[]> => {
   const companies = await fetch(
     "https://hq7pn37pi9.execute-api.eu-west-2.amazonaws.com/prod/companies"
   );
@@ -11,3 +11,9 @@ export const getCompanies = async () => {
       return []
   })
 };
+
+export interface Company {
+  id: string,
+  name: string,
+  createdDate: number
+}
