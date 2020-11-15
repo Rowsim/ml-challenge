@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
+import { AppContext } from "./AppContext";
 
-export const SearchCompany = () => (
-  <SearchCompanyStyled>
-    <input placeholder="Search for a company" />
-  </SearchCompanyStyled>
-);
+export const SearchCompany = () => {
+  const { setSearchTerm } = useContext(AppContext);
+
+  return (
+    <SearchCompanyStyled>
+      <input
+        onChange={(e) => setSearchTerm(e.currentTarget.value)}
+        placeholder="Search for a company"
+      />
+    </SearchCompanyStyled>
+  );
+};
 
 const SearchCompanyStyled = styled.div`
   height: 100%;

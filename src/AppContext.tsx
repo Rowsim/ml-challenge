@@ -4,11 +4,15 @@ import { Company } from "./company-service";
 interface AppContextType {
   companies: Array<Company>;
   setCompanies: Function;
+  searchTerm: string;
+  setSearchTerm: Function;
 }
 
 export const AppContext = createContext<AppContextType>({
   companies: [],
   setCompanies: () => {},
+  searchTerm: "",
+  setSearchTerm: () => {},
 });
 
 export const AppProvider = ({ children }: any) => {
@@ -29,12 +33,15 @@ export const AppProvider = ({ children }: any) => {
       createdDate: 1605312906,
     },
   ] as Company[]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <AppContext.Provider
       value={{
         companies,
         setCompanies,
+        searchTerm,
+        setSearchTerm,
       }}
     >
       {children}

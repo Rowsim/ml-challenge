@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
+import { AppContext } from "./AppContext";
+import { createCompany } from "./company-service";
 
-export const CreateCompany = () => (
-  <CreateCompanyStyled>
-    <input placeholder="Company Name" />
-    <div className="add-company-btn">Add</div>
-  </CreateCompanyStyled>
-);
+export const CreateCompany = () => {
+  const { companies, setCompanies } = useContext(AppContext);
+  const [companyName, setCompanyName] = useState("");
+
+  const createCompanyAndUpdateState = async () => {
+    const createResult = await createCompany(companyName);
+    if (createResult) {
+      setCompanies([...companies, createResult]);
+      setCompanyName("");
+    }
+  };
+
+  return (
+    <CreateCompanyStyled>
+      <input
+        placeholder="Company Name"
+        value={companyName}
+        onChange={(e) => setCompanyName(e.currentTarget.value)}
+      />
+      <div
+        onClick={() => createCompanyAndUpdateState()}
+        className="add-company-btn"
+      >
+        Add
+      </div>
+    </CreateCompanyStyled>
+  );
+};
 
 const CreateCompanyStyled = styled.div`
   height: 100%;

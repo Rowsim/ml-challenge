@@ -1,34 +1,67 @@
 import React, { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { AppContext } from "./AppContext";
+import Fuse from "fuse.js";
 import { ReactComponent as DeleteSvg } from "./assets/remove.svg";
+import { Company, deleteCompany } from "./company-service";
 
 export const Companies = () => {
-  const { companies } = useContext(AppContext);
+  const { companies, searchTerm } = useContext(AppContext);
 
   useEffect(() => {
     //getCompanies().then((results) => setCompanies(results));
   });
 
+  const fuseCompanies = new Fuse(companies, {
+    keys: ["name"],
+  });
+
   return (
-    <CompaniesStyled>
-      {companies &&
-        companies.map((company) => {
-          const createdDate = new Date(company.createdDate * 1000);
-          return (
-            <div key={company.name} className="company-tile">
-              <div className="company-tile__top">
-                <div className="company-tile__title">{company.name}</div>
-                <DeleteSvg onClick={() => alert("test..")}/>
-              </div>
-              <div className="company-tile__details">
-                <div className="company-tile__details__id">{company.id}</div>
-                <div>{`${createdDate.getDate()}/${createdDate.getMonth()}/${createdDate.getFullYear()}`}</div>
-              </div>
-            </div>
-          );
-        })}
-    </CompaniesStyled>
+    <>
+      {companies && (
+        <CompaniesStyled>
+          {searchTerm
+            ? fuseCompanies.search(searchTerm).map((result) => {
+                return (
+                  <CompanyTile key={result.item.name} company={result.item} />
+                );
+              })
+            : companies.map((company) => (
+                <CompanyTile key={company.name} company={company} />
+              ))}
+        </CompaniesStyled>
+      )}
+    </>
+  );
+};
+
+const CompanyTile = ({ company }: { company: Company }) => {
+  const createdDate = new Date(company.createdDate * 1000);
+  const { companies, setCompanies } = useContext(AppContext);
+
+  const handleDeleteCompany = async (id: string) => {
+    const success = await deleteCompany(id);
+    if (success) {
+      const companiesFiltered = companies.filter(
+        (company) => company.id !== id
+      );
+      setCompanies(companiesFiltered);
+    }
+  };
+
+  return (
+    <div className="company-tile">
+      <div className="company-tile__top">
+        <div className="company-tile__title">{company.name}</div>
+        <DeleteSvg onClick={() => handleDeleteCompany(company.id)} />
+      </div>
+      <div className="company-tile__details">
+        <div className="company-tile__details__id">{company.id}</div>
+        <div>{`${createdDate.getDate()}/${
+          createdDate.getMonth() + 1
+        }/${createdDate.getFullYear()}`}</div>
+      </div>
+    </div>
   );
 };
 
@@ -54,14 +87,13 @@ const CompaniesStyled = styled.div`
     box-shadow: -2px 2px 3px rgba(0, 0, 0, 0.1);
 
     &:hover {
-      background: rgba(0,0,0,0.1);
+      background: rgba(0, 0, 0, 0.1);
     }
 
     @media only screen and (min-width: 425px) {
       margin-right: 24px;
       min-width: 280px;
     }
-  
 
     &__top {
       display: flex;
