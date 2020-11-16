@@ -1,6 +1,4 @@
-import { useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { AppContext } from "./AppContext";
 
 const AWS_URI = "https://hq7pn37pi9.execute-api.eu-west-2.amazonaws.com/prod";
 
@@ -22,7 +20,7 @@ export const createCompany = async (
   const payload: Company = {
     id: uuidv4(),
     name,
-    createdDate: +new Date(),
+    createdDate: +new Date() / 1000,
   };
 
   const response = await fetch(`${AWS_URI}/companies`, {
@@ -62,4 +60,11 @@ export interface Company {
   id: string;
   name: string;
   createdDate: number;
+  contact?: Contact;
+}
+
+export interface Contact {
+  telephone?: number;
+  email?: string;
+  address?: string;
 }

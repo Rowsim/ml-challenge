@@ -10,7 +10,7 @@ function App() {
   return (
     <AppProvider>
       <AppStyle>
-        <h1>ML-Challenge</h1>
+        <h1>Mission Labs Challenge</h1>
         <div className="top-controls">
           <CreateCompany />
           <SearchCompany />
@@ -25,6 +25,9 @@ const AppStyle = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  h1 {
+    color: teal;
+  }
 
   .top-controls {
     width: 100%;
