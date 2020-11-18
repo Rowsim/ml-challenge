@@ -27,6 +27,7 @@ const AppStyle = styled.div`
   align-items: center;
   h1 {
     color: teal;
+    text-align: center;
   }
 
   .top-controls {

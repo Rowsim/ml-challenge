@@ -1,9 +1,17 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { AppContext } from "./AppContext";
 import Fuse from "fuse.js";
 import { ReactComponent as DeleteSvg } from "./assets/remove.svg";
-import { Company, deleteCompany, getCompanies } from "./company-service";
+import { ReactComponent as EditSvg } from "./assets/edit.svg";
+import { ReactComponent as CheckSvg } from "./assets/check.svg";
+
+import {
+  Company,
+  deleteCompany,
+  getCompanies,
+  updateCompanyContact,
+} from "./company-service";
 
 export const Companies = () => {
   const { companies, setCompanies, searchTerm, selectedCompany } = useContext(
@@ -11,8 +19,11 @@ export const Companies = () => {
   );
 
   useEffect(() => {
-    //getCompanies().then((results) => setCompanies(results));
-  });
+    getCompanies().then((results) => {
+      console.log(results);
+      setCompanies(results);
+    });
+  }, [setCompanies]);
 
   const fuseCompanies = new Fuse(companies, {
     keys: ["name"],
@@ -52,10 +63,20 @@ const CompanyTile = ({
   company: Company;
   selected?: boolean;
 }) => {
-  const createdDate = new Date(company.createdDate * 1000);
-  const { companies, setCompanies, setSelectedCompany } = useContext(
-    AppContext
+  const {
+    companies,
+    setCompanies,
+    selectedCompany,
+    setSelectedCompany,
+  } = useContext(AppContext);
+  const createdDate = new Date(company.createdDate);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [telephoneInput, setTelephoneInput] = useState(
+    company.contact?.telephone
   );
+  const [emailInput, setEmailInput] = useState(company.contact?.email);
+  const [addressInput, setAddressInput] = useState(company.contact?.address);
 
   const handleDeleteCompany = async (id: string) => {
     const success = await deleteCompany(id);
@@ -65,6 +86,37 @@ const CompanyTile = ({
       );
       setCompanies(companiesFiltered);
     }
+  };
+
+  const handleUpdateCompany = async () => {
+    const updatedContact = {
+      ...(telephoneInput && { telephone: telephoneInput }),
+      ...(emailInput && { email: emailInput }),
+      ...(addressInput && { address: addressInput }),
+    };
+
+    if (
+      JSON.stringify(selectedCompany.contact) !== JSON.stringify(updatedContact)
+    ) {
+      const success = await updateCompanyContact(
+        selectedCompany.id,
+        updatedContact
+      );
+
+      if (success) {
+        const updatedCompany = {
+          ...selectedCompany,
+          contact: updatedContact,
+        };
+
+        const companiesFiltered = companies.filter(
+          (company) => company.id !== selectedCompany.id
+        );
+        setCompanies([updatedCompany, ...companiesFiltered]);
+      }
+    }
+
+    setIsEditing(false);
   };
 
   return (
@@ -80,18 +132,76 @@ const CompanyTile = ({
             createdDate.getMonth() + 1
           }/${createdDate.getFullYear()}`}</div>
         </div>
-        {company.contact && selected && (
-          <div className="company-tile__contact">
-            {company.contact.telephone && (
-              <div>{company.contact.telephone}</div>
+        {selected && (
+          <>
+            <div className="company-tile__contact">
+              {isEditing ? (
+                <>
+                  <input
+                    placeholder="Telephone"
+                    pattern="[0-9]*"
+                    value={telephoneInput ? telephoneInput : ''}
+                    onChange={(e) => {
+                      const value = e.currentTarget.value;
+                      if (value) {
+                        setTelephoneInput(e.currentTarget.value);
+                      } else {
+                        setTelephoneInput(undefined);
+                      }
+                    }}
+                  />
+
+                  <input
+                    placeholder="Email"
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.currentTarget.value)}
+                  />
+
+                  <input
+                    placeholder="Address"
+                    value={addressInput}
+                    onChange={(e) => setAddressInput(e.currentTarget.value)}
+                  />
+                </>
+              ) : (
+                <>
+                  {company.contact && (
+                    <>
+                      {company.contact.telephone && (
+                        <div>{company.contact.telephone}</div>
+                      )}
+                      {company.contact.email && (
+                        <a href={`mailto:${company.contact.email}`}>
+                          {company.contact.email.toLocaleLowerCase()}
+                        </a>
+                      )}
+                      {company.contact.address && (
+                        <div className="company-tile__contact__address">{company.contact.address}</div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+            {isEditing ? (
+              <CheckSvg
+                className="control-btn control-btn--save"
+                onClick={() => handleUpdateCompany()}
+              />
+            ) : (
+              <EditSvg
+                className="control-btn control-btn--edit"
+                onClick={() => {
+                  setSelectedCompany(company);
+                  setIsEditing(true);
+                }}
+              />
             )}
-            {company.contact.email && <div>{company.contact.email}</div>}
-            {company.contact.address && <div>{company.contact.address}</div>}
-          </div>
+          </>
         )}
       </div>
       <DeleteSvg
-        className="delete-btn"
+        className="control-btn control-btn--delete"
         onClick={() => handleDeleteCompany(company.id)}
       />
     </div>
@@ -113,12 +223,11 @@ const CompaniesStyled = styled.div`
     cursor: pointer;
   }
 
-  .delete-btn {
+  .control-btn {
     position: absolute;
-    top: 3px;
-    right: 0;
+    right: 2px;
     height: 24px;
-    fill: red;
+    cursor: pointer;
 
     &:hover {
       opacity: 0.8;
@@ -128,7 +237,31 @@ const CompaniesStyled = styled.div`
     }
 
     @media only screen and (min-width: 425px) {
-      right: 25px;
+      right: 27px;
+    }
+
+    &--delete {
+      fill: red;
+      top: 3px;
+    }
+
+    &--edit,
+    &--save {
+      fill: teal;
+      height: 24px;
+      top: unset;
+      bottom: 6px;
+
+      transition: fill 0.6s ease;
+
+      &:hover,
+      &:active {
+        fill: #129612;
+      }
+
+      @media only screen and (min-width: 425px) {
+        bottom: 20px;
+      }
     }
   }
 
@@ -145,6 +278,7 @@ const CompaniesStyled = styled.div`
 
     &--selected {
       background: rgba(0, 128, 128, 0.15);
+      cursor: initial;
     }
 
     &:hover {
@@ -170,7 +304,26 @@ const CompaniesStyled = styled.div`
     }
 
     &__contact {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
       margin: 12px 0 4px 0;
+      font-size: 15px;
+      color: #4c4b4b;
+
+      input {
+        font-size: inherit;
+        color: #129612;
+
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: 1px solid teal;
+      }
+
+      &__address {
+        font-style: italic;
+      }
     }
   }
 `;
