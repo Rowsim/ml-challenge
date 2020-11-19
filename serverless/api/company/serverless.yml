@@ -17,6 +17,13 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:eu-west-2:204894123339:table/ml-companies"
 
+plugins:
+  - serverless-api-gateway-throttling
+custom:
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 10
+    maxConcurrentRequests: 5
+
 functions:
   getCompanies:
     handler: handler.getCompanies
