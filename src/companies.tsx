@@ -149,18 +149,27 @@ const CompanyTile = ({
                         setTelephoneInput(undefined);
                       }
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleUpdateCompany();
+                    }}
                   />
 
                   <input
                     placeholder="Email"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.currentTarget.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleUpdateCompany();
+                    }}
                   />
 
                   <input
                     placeholder="Address"
                     value={addressInput}
                     onChange={(e) => setAddressInput(e.currentTarget.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleUpdateCompany();
+                    }}
                   />
                 </>
               ) : (

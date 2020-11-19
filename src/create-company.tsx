@@ -21,6 +21,9 @@ export const CreateCompany = () => {
         placeholder="Company Name"
         value={companyName}
         onChange={(e) => setCompanyName(e.currentTarget.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") createCompanyAndUpdateState();
+        }}
       />
       <div
         onClick={() => createCompanyAndUpdateState()}
