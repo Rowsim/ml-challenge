@@ -24,9 +24,7 @@ functions:
       - http:
           path: /companies
           method: get
-          cors:
-            origin: "https://*.amazonaws.com"
-            headers: "*"
+          cors: true
   addCompany:
     handler: handler.addCompany
     events:
@@ -39,9 +37,7 @@ functions:
             template:
               application/x-www-form-urlencoded: null
               application/json: null
-          cors:
-            origin: "https://*.amazonaws.com"
-            headers: "*"
+          cors: true
   updateCompany:
     handler: handler.updateCompany
     events:
@@ -54,9 +50,8 @@ functions:
             template:
               application/x-www-form-urlencoded: null
               application/json: null
-          cors:
-            origin: "https://*.amazonaws.com"
-            headers: "*"
+          cors: true
+
   deleteCompany:
     handler: handler.deleteCompany
     events:
@@ -69,6 +64,4 @@ functions:
             template:
               application/x-www-form-urlencoded: null
               application/json: null
-          cors:
-            origin: "https://*.amazonaws.com"
-            headers: "*"
+          cors: true

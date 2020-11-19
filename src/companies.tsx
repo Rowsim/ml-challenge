@@ -223,10 +223,6 @@ const CompaniesStyled = styled.div`
   .company-tile-container {
     position: relative;
     cursor: pointer;
-
-    svg.icon {
-      pointer-events: none;
-    }
   }
 
   .control-btn {

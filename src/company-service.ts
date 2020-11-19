@@ -62,7 +62,11 @@ export const updateCompanyContact = async (
 ): Promise<any> => {
   const payload = {
     id,
-    contact: updatedContact,
+    contact: {
+      telephone: updatedContact.telephone ? updatedContact.telephone : null, //TODO Have to pass nulls here because the db update lambda expects something other than undefined :(
+      email: updatedContact.email ? updatedContact.email : null,
+      address: updatedContact.address ? updatedContact.address : null,
+    },
   };
 
   const response = await fetch(`${AWS_URI}/companies`, {
