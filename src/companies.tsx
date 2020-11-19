@@ -140,7 +140,7 @@ const CompanyTile = ({
                   <input
                     placeholder="Telephone"
                     pattern="[0-9]*"
-                    value={telephoneInput ? telephoneInput : ''}
+                    value={telephoneInput ? telephoneInput : ""}
                     onChange={(e) => {
                       const value = e.currentTarget.value;
                       if (value) {
@@ -176,7 +176,9 @@ const CompanyTile = ({
                         </a>
                       )}
                       {company.contact.address && (
-                        <div className="company-tile__contact__address">{company.contact.address}</div>
+                        <div className="company-tile__contact__address">
+                          {company.contact.address}
+                        </div>
                       )}
                     </>
                   )}
@@ -221,6 +223,10 @@ const CompaniesStyled = styled.div`
   .company-tile-container {
     position: relative;
     cursor: pointer;
+
+    svg.icon {
+      pointer-events: none;
+    }
   }
 
   .control-btn {

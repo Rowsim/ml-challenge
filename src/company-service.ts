@@ -1,18 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
 
-const AWS_URI = "https://hq7pn37pi9.execute-api.eu-west-2.amazonaws.com/prod";
+const AWS_URI = "https://pa9g8b2sj9.execute-api.eu-west-2.amazonaws.com/prod";
 
 export const getCompanies = async (): Promise<Company[]> => {
-  const companies = await fetch(`${AWS_URI}/companies`);
-  const companiesJson = companies.json();
-  console.log(companiesJson);
-
-  return companiesJson.then((result) => {
-    if (result.statusCode === 200) {
-      return JSON.parse(result.body);
-    }
-    return [];
-  });
+  const companiesResponse = await fetch(`${AWS_URI}/companies`);
+  console.log(`GET /companies: ${companiesResponse}`);
+  if (companiesResponse.status === 200) {
+    const companiesJson = await companiesResponse.json();
+    return companiesJson;
+  }
+  return [];
 };
 
 export const createCompany = async (
