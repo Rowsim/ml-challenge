@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import { AppProvider } from "./AppContext";
 import { Companies } from "./companies";
-
 import { CreateCompany } from "./create-company";
 import { SearchCompany } from "./search-company";
 
