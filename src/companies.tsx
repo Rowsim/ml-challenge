@@ -5,6 +5,7 @@ import Fuse from "fuse.js";
 import { ReactComponent as DeleteSvg } from "./assets/remove.svg";
 import { ReactComponent as EditSvg } from "./assets/edit.svg";
 import { ReactComponent as CheckSvg } from "./assets/check.svg";
+import { ReactComponent as LoadingSvg } from "./assets/loading.svg";
 
 import {
   Company,
@@ -20,7 +21,6 @@ export const Companies = () => {
 
   useEffect(() => {
     getCompanies().then((results) => {
-      console.log(results);
       setCompanies(results);
     });
   }, [setCompanies]);
@@ -31,7 +31,7 @@ export const Companies = () => {
 
   return (
     <>
-      {companies && (
+      {companies && companies.length >= 1 ? (
         <CompaniesStyled>
           {searchTerm
             ? fuseCompanies.search(searchTerm).map((result) => {
@@ -51,7 +51,7 @@ export const Companies = () => {
                 />
               ))}
         </CompaniesStyled>
-      )}
+      ) : (<LoadingStyled><LoadingSvg /></LoadingStyled>)}
     </>
   );
 };
@@ -338,3 +338,18 @@ const CompaniesStyled = styled.div`
     }
   }
 `;
+
+const LoadingStyled = styled.div`
+margin-top: 40px;
+animation: rotate 2s linear infinite;
+
+svg {
+  fill: teal;
+  height: 80px;
+  width: 80px;
+}
+
+@keyframes rotate {
+  to { transform: rotate(360deg); }
+}
+`
